@@ -1,45 +1,52 @@
 import json
 from dataclasses import dataclass
-from datetime import datetime
 from typing import List
 
 @dataclass
-class RepairSession:
-    id: int
-    status: str
-    tool_file: str = None
-    approved: bool = False
+class Tool:
+    name: str
+    description: str
+
+@dataclass
+class Part:
+    name: str
+    description: str
 
 class SpaceRepairAssist:
     def __init__(self):
-        self.sessions = []
-        self.approved_tools = []
+        self.tools = []
+        self.parts = []
 
-    def add_session(self, session: RepairSession):
-        self.sessions.append(session)
+    def request_tool(self, tool_name: str, description: str):
+        tool = Tool(tool_name, description)
+        self.tools.append(tool)
+        return tool
 
-    def list_sessions(self):
-        return self.sessions
+    def request_part(self, part_name: str, description: str):
+        part = Part(part_name, description)
+        self.parts.append(part)
+        return part
 
-    def approve_tool(self, session_id: int):
-        for session in self.sessions:
-            if session.id == session_id:
-                session.approved = True
-                session.tool_file = f"tool_{session_id}.stl"
-                self.approved_tools.append(session.tool_file)
-                return f"Tool approved for session {session_id} at {datetime.now()}"
-        return "Session not found"
+    def fabricate_tool(self, tool_name: str):
+        for tool in self.tools:
+            if tool.name == tool_name:
+                return tool
+        return None
 
-    def reject_tool(self, session_id: int):
-        for session in self.sessions:
-            if session.id == session_id:
-                session.approved = False
-                return f"Tool rejected for session {session_id} at {datetime.now()}"
-        return "Session not found"
+    def fabricate_part(self, part_name: str):
+        for part in self.parts:
+            if part.name == part_name:
+                return part
+        return None
 
-    def send_to_printer(self):
-        printed_tools = []
-        for tool in self.approved_tools:
-            printed_tools.append(tool)
-            print(f"Sending {tool} to printer")
-        return printed_tools
+    def receive_tool(self, tool_name: str):
+        tool = self.fabricate_tool(tool_name)
+        if tool:
+            return tool
+        return None
+
+    def receive_part(self, part_name: str):
+        part = self.fabricate_part(part_name)
+        if part:
+            return part
+        return None

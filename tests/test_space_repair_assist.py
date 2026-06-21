@@ -1,46 +1,51 @@
-from space_repair_assist import SpaceRepairAssist, RepairSession
+from space_repair_assist import SpaceRepairAssist, Tool, Part
 
-def test_add_session():
+def test_request_tool():
     assist = SpaceRepairAssist()
-    session = RepairSession(1, "diagnosing")
-    assist.add_session(session)
-    assert len(assist.list_sessions()) == 1
+    tool = assist.request_tool("Wrench", "A tool for tightening bolts")
+    assert tool.name == "Wrench"
+    assert tool.description == "A tool for tightening bolts"
 
-def test_list_sessions():
+def test_request_part():
     assist = SpaceRepairAssist()
-    session1 = RepairSession(1, "diagnosing")
-    session2 = RepairSession(2, "guiding")
-    assist.add_session(session1)
-    assist.add_session(session2)
-    sessions = assist.list_sessions()
-    assert len(sessions) == 2
-    assert sessions[0].id == 1
-    assert sessions[1].id == 2
+    part = assist.request_part("Bolt", "A part for holding things together")
+    assert part.name == "Bolt"
+    assert part.description == "A part for holding things together"
 
-def test_approve_tool():
+def test_fabricate_tool():
     assist = SpaceRepairAssist()
-    session = RepairSession(1, "diagnosing")
-    assist.add_session(session)
-    result = assist.approve_tool(1)
-    assert result.startswith("Tool approved")
+    tool = assist.request_tool("Wrench", "A tool for tightening bolts")
+    fabricated_tool = assist.fabricate_tool("Wrench")
+    assert fabricated_tool.name == "Wrench"
+    assert fabricated_tool.description == "A tool for tightening bolts"
 
-def test_reject_tool():
+def test_fabricate_part():
     assist = SpaceRepairAssist()
-    session = RepairSession(1, "diagnosing")
-    assist.add_session(session)
-    result = assist.reject_tool(1)
-    assert result.startswith("Tool rejected")
+    part = assist.request_part("Bolt", "A part for holding things together")
+    fabricated_part = assist.fabricate_part("Bolt")
+    assert fabricated_part.name == "Bolt"
+    assert fabricated_part.description == "A part for holding things together"
 
-def test_send_to_printer():
+def test_receive_tool():
     assist = SpaceRepairAssist()
-    session = RepairSession(1, "diagnosing")
-    assist.add_session(session)
-    assist.approve_tool(1)
-    printed_tools = assist.send_to_printer()
-    assert len(printed_tools) == 1
-    assert printed_tools[0] == "tool_1.stl"
+    tool = assist.request_tool("Wrench", "A tool for tightening bolts")
+    received_tool = assist.receive_tool("Wrench")
+    assert received_tool.name == "Wrench"
+    assert received_tool.description == "A tool for tightening bolts"
 
-def test_session_not_found():
+def test_receive_part():
     assist = SpaceRepairAssist()
-    result = assist.approve_tool(1)
-    assert result == "Session not found"
+    part = assist.request_part("Bolt", "A part for holding things together")
+    received_part = assist.receive_part("Bolt")
+    assert received_part.name == "Bolt"
+    assert received_part.description == "A part for holding things together"
+
+def test_receive_non_existent_tool():
+    assist = SpaceRepairAssist()
+    received_tool = assist.receive_tool("NonExistentTool")
+    assert received_tool is None
+
+def test_receive_non_existent_part():
+    assist = SpaceRepairAssist()
+    received_part = assist.receive_part("NonExistentPart")
+    assert received_part is None
