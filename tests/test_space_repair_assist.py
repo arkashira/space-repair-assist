@@ -1,51 +1,26 @@
-from space_repair_assist import SpaceRepairAssist, Tool, Part
+import pytest
+from space_repair_assist import DiagnosticEngine, FaultLog, ProbableCause
 
-def test_request_tool():
-    assist = SpaceRepairAssist()
-    tool = assist.request_tool("Wrench", "A tool for tightening bolts")
-    assert tool.name == "Wrench"
-    assert tool.description == "A tool for tightening bolts"
+def test_upload_fault_log():
+    engine = DiagnosticEngine()
+    log_data = "Sample log data"
+    engine.upload_fault_log(log_data)
+    assert len(engine.fault_logs) == 1
 
-def test_request_part():
-    assist = SpaceRepairAssist()
-    part = assist.request_part("Bolt", "A part for holding things together")
-    assert part.name == "Bolt"
-    assert part.description == "A part for holding things together"
+def test_upload_fault_log_exceeds_limit():
+    engine = DiagnosticEngine()
+    log_data = "a" * (10 * 1024 * 1024 + 1)  # 10 MB + 1 byte
+    with pytest.raises(ValueError):
+        engine.upload_fault_log(log_data)
 
-def test_fabricate_tool():
-    assist = SpaceRepairAssist()
-    tool = assist.request_tool("Wrench", "A tool for tightening bolts")
-    fabricated_tool = assist.fabricate_tool("Wrench")
-    assert fabricated_tool.name == "Wrench"
-    assert fabricated_tool.description == "A tool for tightening bolts"
+def test_diagnose():
+    engine = DiagnosticEngine()
+    causes = engine.diagnose()
+    assert len(causes) == 3
 
-def test_fabricate_part():
-    assist = SpaceRepairAssist()
-    part = assist.request_part("Bolt", "A part for holding things together")
-    fabricated_part = assist.fabricate_part("Bolt")
-    assert fabricated_part.name == "Bolt"
-    assert fabricated_part.description == "A part for holding things together"
-
-def test_receive_tool():
-    assist = SpaceRepairAssist()
-    tool = assist.request_tool("Wrench", "A tool for tightening bolts")
-    received_tool = assist.receive_tool("Wrench")
-    assert received_tool.name == "Wrench"
-    assert received_tool.description == "A tool for tightening bolts"
-
-def test_receive_part():
-    assist = SpaceRepairAssist()
-    part = assist.request_part("Bolt", "A part for holding things together")
-    received_part = assist.receive_part("Bolt")
-    assert received_part.name == "Bolt"
-    assert received_part.description == "A part for holding things together"
-
-def test_receive_non_existent_tool():
-    assist = SpaceRepairAssist()
-    received_tool = assist.receive_tool("NonExistentTool")
-    assert received_tool is None
-
-def test_receive_non_existent_part():
-    assist = SpaceRepairAssist()
-    received_part = assist.receive_part("NonExistentPart")
-    assert received_part is None
+def test_get_top_causes():
+    engine = DiagnosticEngine()
+    top_causes = engine.get_top_causes(2)
+    assert len(top_causes) == 2
+    assert top_causes[0].confidence_score == 0.8
+    assert top_causes[1].confidence_score == 0.5

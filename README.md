@@ -1,14 +1,13 @@
 # Space Repair Assist
 
-A system for requesting and receiving tools or parts for server repair.
+A diagnostic engine for space repair assistance.
 
 ## Usage
 
-1. Create an instance of the `SpaceRepairAssist` class.
-2. Request a tool or part using the `request_tool` or `request_part` method.
-3. Fabricate the requested tool or part using the `fabricate_tool` or `fabricate_part` method.
-4. Receive the fabricated tool or part using the `receive_tool` or `receive_part` method.
+1. Upload a fault log using the `upload_fault_log` method.
+2. Run the `diagnose` method to get a list of probable causes.
+3. Use the `get_top_causes` method to get the top N probable causes.
 
 ## Testing
 
-Run the tests using `pytest` to ensure the system is working correctly.
+Run the tests using `pytest`.
