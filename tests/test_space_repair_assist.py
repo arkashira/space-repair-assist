@@ -1,32 +1,46 @@
-from space_repair_assist import SpaceRepairAssist, ServerRepairScenario
+from space_repair_assist import SpaceRepairAssist, RepairSession
 
-def test_add_scenario():
+def test_add_session():
     assist = SpaceRepairAssist()
-    scenario = ServerRepairScenario('example', 'Example scenario', ['step1', 'step2', 'step3'])
-    assist.add_scenario(scenario)
-    assert len(assist.get_scenarios()) == 1
+    session = RepairSession(1, "diagnosing")
+    assist.add_session(session)
+    assert len(assist.list_sessions()) == 1
 
-def test_get_scenarios():
+def test_list_sessions():
     assist = SpaceRepairAssist()
-    scenario1 = ServerRepairScenario('example1', 'Example scenario 1', ['step1', 'step2', 'step3'])
-    scenario2 = ServerRepairScenario('example2', 'Example scenario 2', ['step4', 'step5', 'step6'])
-    assist.add_scenario(scenario1)
-    assist.add_scenario(scenario2)
-    scenarios = assist.get_scenarios()
-    assert len(scenarios) == 2
-    assert scenarios[0].scenario_name == 'example1'
-    assert scenarios[1].scenario_name == 'example2'
+    session1 = RepairSession(1, "diagnosing")
+    session2 = RepairSession(2, "guiding")
+    assist.add_session(session1)
+    assist.add_session(session2)
+    sessions = assist.list_sessions()
+    assert len(sessions) == 2
+    assert sessions[0].id == 1
+    assert sessions[1].id == 2
 
-def test_simulate_repair_found():
+def test_approve_tool():
     assist = SpaceRepairAssist()
-    scenario = ServerRepairScenario('example', 'Example scenario', ['step1', 'step2', 'step3'])
-    assist.add_scenario(scenario)
-    steps = assist.simulate_repair('example')
-    assert steps == ['step1', 'step2', 'step3']
+    session = RepairSession(1, "diagnosing")
+    assist.add_session(session)
+    result = assist.approve_tool(1)
+    assert result.startswith("Tool approved")
 
-def test_simulate_repair_not_found():
+def test_reject_tool():
     assist = SpaceRepairAssist()
-    scenario = ServerRepairScenario('example', 'Example scenario', ['step1', 'step2', 'step3'])
-    assist.add_scenario(scenario)
-    steps = assist.simulate_repair('not_found')
-    assert steps is None
+    session = RepairSession(1, "diagnosing")
+    assist.add_session(session)
+    result = assist.reject_tool(1)
+    assert result.startswith("Tool rejected")
+
+def test_send_to_printer():
+    assist = SpaceRepairAssist()
+    session = RepairSession(1, "diagnosing")
+    assist.add_session(session)
+    assist.approve_tool(1)
+    printed_tools = assist.send_to_printer()
+    assert len(printed_tools) == 1
+    assert printed_tools[0] == "tool_1.stl"
+
+def test_session_not_found():
+    assist = SpaceRepairAssist()
+    result = assist.approve_tool(1)
+    assert result == "Session not found"

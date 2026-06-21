@@ -1,46 +1,45 @@
 import json
 from dataclasses import dataclass
-from argparse import ArgumentParser
+from datetime import datetime
+from typing import List
 
 @dataclass
-class ServerRepairScenario:
-    scenario_name: str
-    description: str
-    steps: list
+class RepairSession:
+    id: int
+    status: str
+    tool_file: str = None
+    approved: bool = False
 
 class SpaceRepairAssist:
     def __init__(self):
-        self.scenarios = []
+        self.sessions = []
+        self.approved_tools = []
 
-    def add_scenario(self, scenario):
-        self.scenarios.append(scenario)
+    def add_session(self, session: RepairSession):
+        self.sessions.append(session)
 
-    def get_scenarios(self):
-        return self.scenarios
+    def list_sessions(self):
+        return self.sessions
 
-    def simulate_repair(self, scenario_name):
-        for scenario in self.scenarios:
-            if scenario.scenario_name == scenario_name:
-                return scenario.steps
-        return None
+    def approve_tool(self, session_id: int):
+        for session in self.sessions:
+            if session.id == session_id:
+                session.approved = True
+                session.tool_file = f"tool_{session_id}.stl"
+                self.approved_tools.append(session.tool_file)
+                return f"Tool approved for session {session_id} at {datetime.now()}"
+        return "Session not found"
 
-def main():
-    parser = ArgumentParser(description='Space Repair Assist')
-    parser.add_argument('--scenario', help='Scenario name')
-    args = parser.parse_args()
+    def reject_tool(self, session_id: int):
+        for session in self.sessions:
+            if session.id == session_id:
+                session.approved = False
+                return f"Tool rejected for session {session_id} at {datetime.now()}"
+        return "Session not found"
 
-    assist = SpaceRepairAssist()
-    scenario = ServerRepairScenario('example', 'Example scenario', ['step1', 'step2', 'step3'])
-    assist.add_scenario(scenario)
-
-    if args.scenario:
-        steps = assist.simulate_repair(args.scenario)
-        if steps:
-            print(json.dumps(steps))
-        else:
-            print('Scenario not found')
-    else:
-        print('No scenario provided')
-
-if __name__ == '__main__':
-    main()
+    def send_to_printer(self):
+        printed_tools = []
+        for tool in self.approved_tools:
+            printed_tools.append(tool)
+            print(f"Sending {tool} to printer")
+        return printed_tools
