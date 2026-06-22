@@ -1,26 +1,39 @@
-import pytest
-from space_repair_assist import DiagnosticEngine, FaultLog, ProbableCause
+from space_repair_assist import SpaceRepairAssist, ToolOrPart
 
-def test_upload_fault_log():
-    engine = DiagnosticEngine()
-    log_data = "Sample log data"
-    engine.upload_fault_log(log_data)
-    assert len(engine.fault_logs) == 1
+def test_receive_request():
+    assist = SpaceRepairAssist()
+    tool = ToolOrPart("Wrench", "A tool for tightening bolts")
+    assist.receive_request(tool)
+    assert len(assist.requests) == 1
+    assert assist.requests[0].name == "Wrench"
 
-def test_upload_fault_log_exceeds_limit():
-    engine = DiagnosticEngine()
-    log_data = "a" * (10 * 1024 * 1024 + 1)  # 10 MB + 1 byte
-    with pytest.raises(ValueError):
-        engine.upload_fault_log(log_data)
+def test_fabricate():
+    assist = SpaceRepairAssist()
+    tool = ToolOrPart("Wrench", "A tool for tightening bolts")
+    assist.fabricate(tool)
+    assert len(assist.fabricated_tools_or_parts) == 1
+    assert assist.fabricated_tools_or_parts[0].name == "Wrench"
 
-def test_diagnose():
-    engine = DiagnosticEngine()
-    causes = engine.diagnose()
-    assert len(causes) == 3
+def test_process_requests():
+    assist = SpaceRepairAssist()
+    tool1 = ToolOrPart("Wrench", "A tool for tightening bolts")
+    tool2 = ToolOrPart("Pliers", "A tool for gripping objects")
+    assist.receive_request(tool1)
+    assist.receive_request(tool2)
+    assist.process_requests()
+    assert len(assist.fabricated_tools_or_parts) == 2
+    assert assist.fabricated_tools_or_parts[0].name == "Wrench"
+    assert assist.fabricated_tools_or_parts[1].name == "Pliers"
 
-def test_get_top_causes():
-    engine = DiagnosticEngine()
-    top_causes = engine.get_top_causes(2)
-    assert len(top_causes) == 2
-    assert top_causes[0].confidence_score == 0.8
-    assert top_causes[1].confidence_score == 0.5
+def test_get_fabricated_tools_or_parts():
+    assist = SpaceRepairAssist()
+    tool = ToolOrPart("Wrench", "A tool for tightening bolts")
+    assist.fabricate(tool)
+    fabricated_tools = assist.get_fabricated_tools_or_parts()
+    assert len(fabricated_tools) == 1
+    assert fabricated_tools[0].name == "Wrench"
+
+def test_edge_case_empty_request():
+    assist = SpaceRepairAssist()
+    assist.process_requests()
+    assert len(assist.fabricated_tools_or_parts) == 0

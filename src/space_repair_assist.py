@@ -3,34 +3,36 @@ from dataclasses import dataclass
 from typing import List
 
 @dataclass
-class FaultLog:
-    log_data: str
+class ToolOrPart:
+    name: str
+    description: str
 
-@dataclass
-class ProbableCause:
-    cause: str
-    confidence_score: float
-    repair_procedure: str
-
-class DiagnosticEngine:
+class SpaceRepairAssist:
     def __init__(self):
-        self.fault_logs = []
+        self.requests = []
+        self.fabricated_tools_or_parts = []
 
-    def upload_fault_log(self, log_data: str) -> None:
-        if len(log_data) <= 10 * 1024 * 1024:  # 10 MB
-            self.fault_logs.append(FaultLog(log_data))
-        else:
-            raise ValueError("Log data exceeds 10 MB limit")
+    def receive_request(self, tool_or_part: ToolOrPart):
+        self.requests.append(tool_or_part)
 
-    def diagnose(self) -> List[ProbableCause]:
-        # Simulate diagnosis logic
-        causes = [
-            ProbableCause("Cause 1", 0.8, "Repair Procedure 1"),
-            ProbableCause("Cause 2", 0.5, "Repair Procedure 2"),
-            ProbableCause("Cause 3", 0.2, "Repair Procedure 3"),
-        ]
-        return causes
+    def fabricate(self, tool_or_part: ToolOrPart):
+        # Simulate 3D printing fabrication
+        self.fabricated_tools_or_parts.append(tool_or_part)
 
-    def get_top_causes(self, num_causes: int) -> List[ProbableCause]:
-        causes = self.diagnose()
-        return sorted(causes, key=lambda x: x.confidence_score, reverse=True)[:num_causes]
+    def get_fabricated_tools_or_parts(self) -> List[ToolOrPart]:
+        return self.fabricated_tools_or_parts
+
+    def process_requests(self):
+        for request in self.requests:
+            self.fabricate(request)
+
+def main():
+    assist = SpaceRepairAssist()
+    tool = ToolOrPart("Wrench", "A tool for tightening bolts")
+    assist.receive_request(tool)
+    assist.process_requests()
+    fabricated_tools = assist.get_fabricated_tools_or_parts()
+    print(json.dumps([tool.__dict__ for tool in fabricated_tools]))
+
+if __name__ == "__main__":
+    main()

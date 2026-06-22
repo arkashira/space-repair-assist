@@ -1,14 +1,14 @@
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=1.2.0"]
 build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "space-repair-assist"
-version = "0.1.0"
-description = ""
+version = "1.0.0"
+description = "A system for requesting and fabricating tools or parts for space repair"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.2"
+pytest = "^7.1.2"
