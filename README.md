@@ -1,15 +1,12 @@
 # Space Repair Assist
-
-A system for requesting and fabricating tools or parts for space repair.
+A Python project for managing repair sessions and approving tool files.
 
 ## Usage
-
-1. Create a `ToolOrPart` object with the desired name and description.
-2. Create a `SpaceRepairAssist` object.
-3. Call `receive_request` to add the `ToolOrPart` object to the request list.
-4. Call `process_requests` to fabricate the requested tools or parts.
-5. Call `get_fabricated_tools_or_parts` to retrieve the fabricated tools or parts.
+1. Create a new instance of the `SpaceRepairAssist` class.
+2. Add repair sessions using the `add_repair_session` method.
+3. Approve tool files using the `approve_tool` method.
+4. Get the list of repair sessions using the `get_repair_sessions` method.
+5. Get the list of approved tools using the `get_approved_tools` method.
 
 ## Testing
-
-Run `pytest` to execute the tests.
+Run the tests using the `pytest` command.
